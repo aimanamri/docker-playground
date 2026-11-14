@@ -1,1 +1,7 @@
 .env
+
+# local data created by the setups
+pyspark-pgadmin/pgadmin-data/
+pyspark-pgadmin/notebook/
+postgres-jupyter/notebook/
+.DS_Store

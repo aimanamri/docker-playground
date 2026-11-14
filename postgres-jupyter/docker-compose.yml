@@ -1,0 +1,31 @@
+services:
+  pg-database:
+    image: postgres:17.1
+    container_name: postgresql_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432 # [HOST_PORT]:[CONTAINER_PORT], 5433 avoids a clash with a Postgres already on 5432
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-db}
+      - POSTGRES_USER=${POSTGRES_USER:-user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-localdevpw}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pyspark-notebook:
+    image: quay.io/jupyter/pyspark-notebook # from quay.io, not Docker Hub
+    container_name: jupyter_notebook
+    restart: always
+    environment:
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-localdevpw} # token used to log in
+    ports:
+      - "9999:8888"
+    volumes:
+      - ./notebook:/home/jovyan/work
+
+volumes:
+  db-data: # keeps the database between restarts
